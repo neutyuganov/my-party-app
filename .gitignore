@@ -32,3 +32,8 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# Secrets (Supabase keys)
+local.secrets.properties
+secrets.properties
+*.env
