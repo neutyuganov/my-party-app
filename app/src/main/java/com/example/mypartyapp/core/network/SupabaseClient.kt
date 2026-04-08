@@ -7,7 +7,7 @@ import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.storage.Storage
 import com.example.mypartyapp.BuildConfig
 
-val supabase = createSupabaseClient(
+val supabaseClient = createSupabaseClient(
     supabaseUrl = BuildConfig.SUPABASE_URL,
     supabaseKey = BuildConfig.SUPABASE_ANON_KEY
 ) {
