@@ -1,4 +1,4 @@
-package com.example.mypartyapp
+package com.example.mypartyapp.core.network
 
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
