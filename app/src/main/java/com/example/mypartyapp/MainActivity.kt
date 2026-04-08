@@ -16,6 +16,10 @@ import com.example.mypartyapp.ui.theme.MyPartyAppTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Тест подключения Supabase
+        android.util.Log.d("Supabase", "URL: ${supabase.supabaseUrl}")
+
         enableEdgeToEdge()
         setContent {
             MyPartyAppTheme {
