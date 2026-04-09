@@ -11,7 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.mypartyapp.core.network.supabase
+import com.example.mypartyapp.core.network.supabaseClient
+import com.example.mypartyapp.feature.auth.ui.LoginScreen
 import com.example.mypartyapp.ui.theme.MyPartyAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,16 +20,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // Тест подключения Supabase
-        android.util.Log.d("Supabase", "URL: ${supabase.supabaseUrl}")
+        android.util.Log.d("Supabase", "URL: ${supabaseClient.supabaseUrl}")
 
         enableEdgeToEdge()
         setContent {
             MyPartyAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    LoginScreen(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
