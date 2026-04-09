@@ -72,4 +72,6 @@ dependencies {
     implementation("io.github.jan-tennert.supabase:realtime-kt")
     implementation("io.github.jan-tennert.supabase:storage-kt")
     implementation("io.ktor:ktor-client-android:3.1.1")
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
 }
