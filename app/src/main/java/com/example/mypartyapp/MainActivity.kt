@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.mypartyapp.core.network.supabaseClient
-import com.example.mypartyapp.feature.auth.ui.LoginScreen
+import com.example.mypartyapp.feature.auth.ui.AppNavigation
 import com.example.mypartyapp.ui.theme.MyPartyAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -26,25 +26,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyPartyAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    LoginScreen(modifier = Modifier.padding(innerPadding))
+                    AppNavigation(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MyPartyAppTheme {
-        Greeting("Android")
     }
 }

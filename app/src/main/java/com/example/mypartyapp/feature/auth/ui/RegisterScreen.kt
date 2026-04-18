@@ -15,29 +15,46 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun LoginScreen(
+fun RegisterScreen(
     viewModel: AuthViewModel = viewModel(),
     modifier: Modifier = Modifier,
-    onNavigateToRegister: () -> Unit = {},
-    onLoggedIn: () -> Unit = {}
+    onNavigateToLogin: () -> Unit = {},
+    onRegistered: () -> Unit = {}
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var localError by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(viewModel.isAuthenticated) {
-        if (viewModel.isAuthenticated) onLoggedIn()
+        if (viewModel.isAuthenticated) onRegistered()
     }
 
     Column(modifier) {
         TextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
         TextField(value = password, onValueChange = { password = it }, label = { Text("Пароль") })
-        Button({ viewModel.signIn(email, password) }) { Text("Войти") }
+        TextField(
+            value = confirmPassword,
+            onValueChange = { confirmPassword = it },
+            label = { Text("Повтори пароль") }
+        )
+        Button(onClick = {
+            if (password != confirmPassword) {
+                localError = "Пароли не совпадают"
+            } else {
+                localError = null
+                viewModel.signUp(email, password)
+            }
+        }) {
+            Text("Зарегистрироваться")
+        }
         if (viewModel.isLoading) {
             CircularProgressIndicator()
         }
-        Button(onClick = onNavigateToRegister) {
-            Text("Нет аккаунта? Зарегистрируйся")
+        Button(onClick = onNavigateToLogin) {
+            Text("Уже есть аккаунт? Войти")
         }
+        localError?.let { Text(text = it) }
         viewModel.errorMessage?.let { Text(text = it) }
     }
 }
