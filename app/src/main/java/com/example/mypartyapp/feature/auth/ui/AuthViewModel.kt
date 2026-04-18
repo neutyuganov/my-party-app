@@ -21,6 +21,10 @@ class AuthViewModel : ViewModel() {
     var isAuthenticated by mutableStateOf(false)
         private set
 
+    init {
+        isAuthenticated = repository.isSessionActive()
+    }
+
     fun signIn(email: String, password: String) {
         viewModelScope.launch {
             isLoading = true
@@ -29,7 +33,7 @@ class AuthViewModel : ViewModel() {
                 repository.signIn(email, password)
                 isAuthenticated = true
             } catch (e: Exception) {
-                    errorCheck(e.message)
+                errorCheck(e.message)
             } finally {
                 isLoading = false
             }
@@ -51,7 +55,17 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    private fun errorCheck(errorText: String?){
+    fun signOut() {
+        viewModelScope.launch {
+            try {
+                repository.signOut()
+            } finally {
+                isAuthenticated = false
+            }
+        }
+    }
+
+    private fun errorCheck(errorText: String?) {
         errorMessage = when {
             errorText?.contains("Invalid login credentials") == true ->
                 "Неверный email или пароль"
