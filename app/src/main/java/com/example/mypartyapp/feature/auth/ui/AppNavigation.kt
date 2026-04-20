@@ -26,7 +26,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 onNavigateToRegister = { navController.navigate("register") },
                 onLoggedIn = {
                     navController.navigate("home") {
-                        popUpTo("login") { inclusive = true }
+                        popUpTo(navController.graph.id) { inclusive = true }
                     }
                 }
             )
@@ -37,7 +37,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
                 onNavigateToLogin = { navController.navigate("login") },
                 onRegistered = {
                     navController.navigate("home") {
-                        popUpTo("register") { inclusive = true }
+                        popUpTo(navController.graph.id) { inclusive = true }
                     }
                 }
             )
