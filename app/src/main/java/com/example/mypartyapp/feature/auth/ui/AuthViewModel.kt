@@ -57,10 +57,12 @@ class AuthViewModel : ViewModel() {
 
     fun signOut() {
         viewModelScope.launch {
+            isLoading = true
             try {
                 repository.signOut()
             } finally {
                 isAuthenticated = false
+                isLoading = false
             }
         }
     }
