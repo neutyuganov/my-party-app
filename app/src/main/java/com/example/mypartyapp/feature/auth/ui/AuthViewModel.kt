@@ -67,6 +67,10 @@ class AuthViewModel : ViewModel() {
         }
     }
 
+    fun clearError() {
+        errorMessage = null
+    }
+
     private fun errorCheck(errorText: String?) {
         errorMessage = when {
             errorText?.contains("Invalid login credentials") == true ->
