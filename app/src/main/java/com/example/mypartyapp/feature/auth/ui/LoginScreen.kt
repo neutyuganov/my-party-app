@@ -31,7 +31,7 @@ fun LoginScreen(
     Column(modifier) {
         TextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
         TextField(value = password, onValueChange = { password = it }, label = { Text("Пароль") })
-        Button({ viewModel.signIn(email, password) }) { Text("Войти") }
+        Button(onClick = { viewModel.signIn(email, password) }, enabled = !viewModel.isLoading) { Text("Войти") }
         if (viewModel.isLoading) {
             CircularProgressIndicator()
         }

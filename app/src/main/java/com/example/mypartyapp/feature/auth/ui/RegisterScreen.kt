@@ -38,14 +38,17 @@ fun RegisterScreen(
             onValueChange = { confirmPassword = it },
             label = { Text("Повтори пароль") }
         )
-        Button(onClick = {
-            if (password != confirmPassword) {
-                localError = "Пароли не совпадают"
-            } else {
-                localError = null
-                viewModel.signUp(email, password)
-            }
-        }) {
+        Button(
+            onClick = {
+                if (password != confirmPassword) {
+                    localError = "Пароли не совпадают"
+                } else {
+                    localError = null
+                    viewModel.signUp(email, password)
+                }
+            },
+            enabled = !viewModel.isLoading
+        ) {
             Text("Зарегистрироваться")
         }
         if (viewModel.isLoading) {
