@@ -23,7 +23,12 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         composable("login") {
             LoginScreen(
                 viewModel = viewModel,
-                onNavigateToRegister = { navController.navigate("register") },
+                onNavigateToRegister = {
+                    viewModel.clearError()
+                    navController.navigate("register") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                },
                 onLoggedIn = {
                     navController.navigate("home") {
                         popUpTo(navController.graph.id) { inclusive = true }
@@ -34,7 +39,12 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         composable("register") {
             RegisterScreen(
                 viewModel = viewModel,
-                onNavigateToLogin = { navController.navigate("login") },
+                onNavigateToLogin = {
+                    viewModel.clearError()
+                    navController.navigate("login") {
+                        popUpTo("register") { inclusive = true }
+                    }
+                },
                 onRegistered = {
                     navController.navigate("home") {
                         popUpTo(navController.graph.id) { inclusive = true }
