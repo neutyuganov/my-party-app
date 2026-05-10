@@ -16,7 +16,7 @@ class FeedViewModel : ViewModel() {
     var events by mutableStateOf<List<Event>>(emptyList())
         private set
 
-    var isLoading by mutableStateOf(false)
+    var isLoading by mutableStateOf(true)
         private set
 
     var errorMessage by mutableStateOf<String?>(null)

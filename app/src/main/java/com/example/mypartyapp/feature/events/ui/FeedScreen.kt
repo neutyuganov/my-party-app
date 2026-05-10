@@ -38,10 +38,10 @@ fun FeedScreen(
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         when {
-            viewModel.isLoading -> {
+            viewModel.isLoading && viewModel.events.isEmpty() -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
-            viewModel.errorMessage != null -> {
+            viewModel.errorMessage != null && viewModel.events.isEmpty() -> {
                 Column(
                     modifier = Modifier.align(Alignment.Center),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -127,10 +127,12 @@ fun EventCard(event: Event) {
     }
 }
 
+private val RU_LOCALE = Locale("ru")
+private val DATE_FORMATTER = DateTimeFormatter.ofPattern("d MMMM, HH:mm", RU_LOCALE)
+
 private fun formatDate(isoString: String): String {
     return try {
-        val dt = OffsetDateTime.parse(isoString)
-        dt.format(DateTimeFormatter.ofPattern("d MMMM, HH:mm", Locale("ru")))
+        OffsetDateTime.parse(isoString).format(DATE_FORMATTER)
     } catch (e: Exception) {
         isoString
     }
