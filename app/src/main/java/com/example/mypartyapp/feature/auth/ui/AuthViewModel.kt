@@ -40,12 +40,12 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    fun signUp(email: String, password: String) {
+    fun signUp(email: String, password: String, username: String) {
         viewModelScope.launch {
             isLoading = true
             errorMessage = null
             try {
-                repository.signUp(email, password)
+                repository.signUp(email, password, username)
                 isAuthenticated = true
             } catch (e: Exception) {
                 errorCheck(e.message)

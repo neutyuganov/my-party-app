@@ -21,6 +21,7 @@ fun RegisterScreen(
     onNavigateToLogin: () -> Unit = {},
     onRegistered: () -> Unit = {}
 ) {
+    var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -31,6 +32,7 @@ fun RegisterScreen(
     }
 
     Column(modifier) {
+        TextField(value = username, onValueChange = { username = it }, label = { Text("Имя пользователя") })
         TextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
         TextField(value = password, onValueChange = { password = it }, label = { Text("Пароль") })
         TextField(
@@ -40,11 +42,13 @@ fun RegisterScreen(
         )
         Button(
             onClick = {
-                if (password != confirmPassword) {
-                    localError = "Пароли не совпадают"
-                } else {
-                    localError = null
-                    viewModel.signUp(email, password)
+                when {
+                    username.isBlank() -> localError = "Введи имя пользователя"
+                    password != confirmPassword -> localError = "Пароли не совпадают"
+                    else -> {
+                        localError = null
+                        viewModel.signUp(email, password, username.trim())
+                    }
                 }
             },
             enabled = !viewModel.isLoading
