@@ -6,7 +6,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.mypartyapp.feature.home.ui.HomeScreen
+import com.example.mypartyapp.feature.events.ui.FeedScreen
 
 @Composable
 fun AppNavigation(modifier: Modifier = Modifier) {
@@ -53,7 +53,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             )
         }
         composable("home") {
-            HomeScreen(
+            FeedScreen(
                 onSignOut = {
                     viewModel.signOut()
                     navController.navigate("login") {
