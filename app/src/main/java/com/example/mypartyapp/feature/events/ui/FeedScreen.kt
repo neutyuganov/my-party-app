@@ -16,9 +16,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,34 +31,53 @@ import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FeedScreen(
     modifier: Modifier = Modifier,
-    viewModel: FeedViewModel = viewModel(),
-    onSignOut: () -> Unit = {}
+    viewModel: FeedViewModel = viewModel()
 ) {
-    Box(modifier = modifier.fillMaxSize()) {
+    if (viewModel.isLoading && viewModel.events.isEmpty()) {
+        Box(modifier = modifier.fillMaxSize()) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
+        return
+    }
+
+    PullToRefreshBox(
+        modifier = modifier.fillMaxSize(),
+        isRefreshing = viewModel.isLoading,
+        onRefresh = { viewModel.loadFeed() }
+    ) {
         when {
-            viewModel.isLoading && viewModel.events.isEmpty() -> {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
             viewModel.errorMessage != null && viewModel.events.isEmpty() -> {
-                Column(
-                    modifier = Modifier.align(Alignment.Center),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(viewModel.errorMessage!!)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = { viewModel.loadFeed() }) {
-                        Text("Повторить")
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    item {
+                        Column(
+                            modifier = Modifier.fillParentMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(viewModel.errorMessage!!)
+                            Spacer(Modifier.height(8.dp))
+                            Button(onClick = { viewModel.loadFeed() }) {
+                                Text("Повторить")
+                            }
+                        }
                     }
                 }
             }
             viewModel.events.isEmpty() -> {
-                Text(
-                    text = "Пока нет мероприятий 🎉",
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("Пока нет мероприятий 🎉")
+                        }
+                    }
+                }
             }
             else -> {
                 LazyColumn(
@@ -70,15 +90,6 @@ fun FeedScreen(
                     }
                 }
             }
-        }
-
-        TextButton(
-            onClick = onSignOut,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(8.dp)
-        ) {
-            Text("Выйти")
         }
     }
 }
