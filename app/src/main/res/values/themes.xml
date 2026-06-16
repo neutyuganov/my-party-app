@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.MyPartyApp" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.MyPartyApp" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#FFFFFF</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.MyPartyApp.App</item>
+    </style>
+
+    <style name="Theme.MyPartyApp.App" parent="android:Theme.Material.Light.NoActionBar" />
+
 </resources>

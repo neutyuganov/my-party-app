@@ -11,6 +11,12 @@ private data class ProfileInsert(val id: String, val username: String)
 
 class AuthRepository {
 
+    // Ждёт полного завершения инициализации Auth: загрузка токена с диска +
+    // сетевой refresh если токен протух. Только после этого currentSessionOrNull() стабилен.
+    suspend fun awaitSessionInit() {
+        supabaseClient.auth.awaitInitialization()
+    }
+
     fun isSessionActive(): Boolean {
         return supabaseClient.auth.currentSessionOrNull() != null
     }
@@ -22,7 +28,15 @@ class AuthRepository {
         }
         val userId = supabaseClient.auth.currentUserOrNull()?.id
             ?: throw Exception("Не удалось получить ID пользователя")
-        supabaseClient.postgrest.from("profiles").insert(ProfileInsert(userId, username))
+        try {
+            supabaseClient.postgrest.from("profiles").insert(ProfileInsert(userId, username))
+        } catch (e: Exception) {
+            // Профиль не создался — сбрасываем сессию, чтобы пользователь не оказался
+            // авторизован без профиля. Запись в auth.users остаётся — admin key нужен для удаления.
+            // Постоянное решение: PostgreSQL-триггер on INSERT to auth.users создаёт профиль сам.
+            runCatching { supabaseClient.auth.signOut() }
+            throw e
+        }
     }
 
     suspend fun signIn(email: String, password: String) {
@@ -32,6 +46,7 @@ class AuthRepository {
         }
     }
 
+    // Выход сбрасывает локальную сессию даже при недоступном сервере
     suspend fun signOut() {
         supabaseClient.auth.signOut()
     }
