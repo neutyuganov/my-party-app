@@ -63,7 +63,7 @@ fun RegisterScreen(
     ) {
         Image(
             painter = painterResource(R.drawable.logo),
-            contentDescription = "Логотип MyPartyApp",
+            contentDescription = "Логотип Сонм",
             modifier = Modifier.size(72.dp)
         )
         Spacer(Modifier.height(12.dp))

@@ -62,7 +62,7 @@ fun LoginScreen(
     ) {
         Image(
             painter = painterResource(R.drawable.logo),
-            contentDescription = "Логотип MyPartyApp",
+            contentDescription = "Логотип Сонм",
             modifier = Modifier.size(96.dp)
         )
         Spacer(Modifier.height(16.dp))
