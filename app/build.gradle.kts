@@ -18,10 +18,20 @@ android {
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        val props = Properties()
-        props.load(rootProject.file("local.properties").inputStream())
-        buildConfigField("String", "SUPABASE_URL", "\"${props["SUPABASE_URL"]}\"")
-        buildConfigField("String", "SUPABASE_ANON_KEY", "\"${props["SUPABASE_ANON_KEY"]}\"")
+        // Читаем local.properties безопасно: файла может не быть (свежий clone, CI).
+        // Ключи берём из файла, иначе из переменных окружения, иначе падаем с понятным сообщением.
+        val props = Properties().apply {
+            val f = rootProject.file("local.properties")
+            if (f.exists()) f.inputStream().use { load(it) }
+        }
+        val supabaseUrl = props.getProperty("SUPABASE_URL")
+            ?: System.getenv("SUPABASE_URL")
+            ?: error("SUPABASE_URL не задан в local.properties или переменных окружения")
+        val supabaseAnonKey = props.getProperty("SUPABASE_ANON_KEY")
+            ?: System.getenv("SUPABASE_ANON_KEY")
+            ?: error("SUPABASE_ANON_KEY не задан в local.properties или переменных окружения")
+        buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
     }
 
     buildTypes {
