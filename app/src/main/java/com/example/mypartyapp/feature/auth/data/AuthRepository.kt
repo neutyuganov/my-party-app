@@ -3,11 +3,8 @@ package com.example.mypartyapp.feature.auth.data
 import com.example.mypartyapp.core.network.supabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
-import io.github.jan.supabase.postgrest.postgrest
-import kotlinx.serialization.Serializable
-
-@Serializable
-private data class ProfileInsert(val id: String, val username: String)
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class AuthRepository {
 
@@ -21,21 +18,16 @@ class AuthRepository {
         return supabaseClient.auth.currentSessionOrNull() != null
     }
 
+    // Профиль НЕ создаётся здесь вручную: строку в public.profiles создаёт серверный
+    // триггер on_auth_user_created → handle_new_user(), читая username из метаданных.
+    // Поэтому username передаём в data (raw_user_meta_data), а не отдельным INSERT.
     suspend fun signUp(email: String, password: String, username: String) {
         supabaseClient.auth.signUpWith(Email) {
             this.email = email
             this.password = password
-        }
-        val userId = supabaseClient.auth.currentUserOrNull()?.id
-            ?: throw Exception("Не удалось получить ID пользователя")
-        try {
-            supabaseClient.postgrest.from("profiles").insert(ProfileInsert(userId, username))
-        } catch (e: Exception) {
-            // Профиль не создался — сбрасываем сессию, чтобы пользователь не оказался
-            // авторизован без профиля. Запись в auth.users остаётся — admin key нужен для удаления.
-            // Постоянное решение: PostgreSQL-триггер on INSERT to auth.users создаёт профиль сам.
-            runCatching { supabaseClient.auth.signOut() }
-            throw e
+            data = buildJsonObject {
+                put("username", username)
+            }
         }
     }
 

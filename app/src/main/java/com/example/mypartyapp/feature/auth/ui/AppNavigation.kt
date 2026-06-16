@@ -22,7 +22,7 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     val viewModel: AuthViewModel = viewModel()
 
     // Пока Auth SDK инициализируется — показываем пустой экран.
-    // Он не виден: splash screen от MainActivity лежит поверх до isCheckingSession = false.
+    // Он не виден: системный splash лежит поверх до isCheckingSession = false.
     if (viewModel.isCheckingSession) {
         Box(modifier = modifier.fillMaxSize())
         return

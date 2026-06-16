@@ -22,8 +22,9 @@ class MainActivity : ComponentActivity() {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        // Держим системный splash screen пока Auth SDK загружает сессию с диска.
-        // Как только isCheckingSession = false — splash автоматически исчезает.
+        // Держим системный splash пока Auth SDK проверяет сессию.
+        // Примечание: на ПЕРВОМ запуске после установки Android может не нарисовать
+        // иконку на splash (особенность платформы) — это косметика, не баг кода.
         splashScreen.setKeepOnScreenCondition { authViewModel.isCheckingSession }
 
         enableEdgeToEdge()
