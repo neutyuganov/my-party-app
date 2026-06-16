@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mypartyapp.feature.events.domain.Event
 import com.example.mypartyapp.feature.events.domain.PaymentType
+import com.example.mypartyapp.ui.theme.AccentPurple
+import com.example.mypartyapp.ui.theme.Teal
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -127,7 +129,20 @@ fun EventCard(event: Event) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = if (event.paymentType == PaymentType.FREE) "Бесплатно" else "${event.price} ₽",
+                    // FREE — бесплатно; PREPAID — цена с человека; POSTPAID — сумма
+                    // делится между пришедшими и заранее неизвестна (см. DATABASE.md).
+                    text = when (event.paymentType) {
+                        PaymentType.FREE -> "Бесплатно"
+                        PaymentType.PREPAID -> "${event.price} ₽"
+                        PaymentType.POSTPAID -> "Постоплата"
+                    },
+                    // Цвета из дизайн-системы: Teal — бесплатно, Purple — постоплата,
+                    // primary (малиновый) — платная предоплата.
+                    color = when (event.paymentType) {
+                        PaymentType.FREE -> Teal
+                        PaymentType.PREPAID -> MaterialTheme.colorScheme.primary
+                        PaymentType.POSTPAID -> AccentPurple
+                    },
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold
                 )

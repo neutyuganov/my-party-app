@@ -1,5 +1,6 @@
 package com.example.mypartyapp.feature.events.domain
 
+import android.util.Log
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -8,19 +9,26 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
+// Значения строк должны точно совпадать с CHECK-ограничениями в БД (см. DATABASE.md):
+//   events.status        ∈ ('active','cancelled','finished')
+//   events.payment_type  ∈ ('free','prepaid','postpaid')
 @Serializable(with = EventStatus.Serializer::class)
 enum class EventStatus(val value: String) {
     ACTIVE("active"),
     CANCELLED("cancelled"),
-    COMPLETED("completed");
+    FINISHED("finished");
 
-    // Неизвестное значение из БД не крашит приложение — возвращаем ACTIVE как дефолт
+    // Неизвестное значение из БД не крашит приложение — возвращаем ACTIVE как дефолт,
+    // но логируем: это почти всегда сигнал о рассинхроне модели и схемы БД.
     internal object Serializer : KSerializer<EventStatus> {
         override val descriptor = PrimitiveSerialDescriptor("EventStatus", PrimitiveKind.STRING)
         override fun serialize(encoder: Encoder, value: EventStatus) = encoder.encodeString(value.value)
         override fun deserialize(decoder: Decoder): EventStatus {
             val raw = decoder.decodeString()
-            return entries.find { it.value == raw } ?: ACTIVE
+            return entries.find { it.value == raw } ?: run {
+                Log.w("EventStatus", "Неизвестный status из БД: '$raw' → fallback ACTIVE")
+                ACTIVE
+            }
         }
     }
 }
@@ -28,14 +36,18 @@ enum class EventStatus(val value: String) {
 @Serializable(with = PaymentType.Serializer::class)
 enum class PaymentType(val value: String) {
     FREE("free"),
-    PAID("paid");
+    PREPAID("prepaid"),
+    POSTPAID("postpaid");
 
     internal object Serializer : KSerializer<PaymentType> {
         override val descriptor = PrimitiveSerialDescriptor("PaymentType", PrimitiveKind.STRING)
         override fun serialize(encoder: Encoder, value: PaymentType) = encoder.encodeString(value.value)
         override fun deserialize(decoder: Decoder): PaymentType {
             val raw = decoder.decodeString()
-            return entries.find { it.value == raw } ?: FREE
+            return entries.find { it.value == raw } ?: run {
+                Log.w("PaymentType", "Неизвестный payment_type из БД: '$raw' → fallback FREE")
+                FREE
+            }
         }
     }
 }

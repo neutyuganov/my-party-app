@@ -1,5 +1,6 @@
 package com.example.mypartyapp.feature.events.ui
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.mypartyapp.feature.events.data.EventRepository
 import com.example.mypartyapp.feature.events.domain.Event
 import kotlinx.coroutines.launch
+
+private const val TAG = "FeedViewModel"
 
 class FeedViewModel : ViewModel() {
 
@@ -38,6 +41,7 @@ class FeedViewModel : ViewModel() {
             try {
                 events = repository.getFeed()
             } catch (e: Exception) {
+                Log.e(TAG, "getFeed failed", e)
                 errorMessage = "Не удалось загрузить ленту"
             } finally {
                 isInitialLoading = false
@@ -46,13 +50,16 @@ class FeedViewModel : ViewModel() {
     }
 
     fun refresh() {
-        if (isRefreshing) return
+        // Не запускаем обновление поверх первичной загрузки или другого обновления —
+        // иначе к серверу уйдут два параллельных запроса.
+        if (isRefreshing || isInitialLoading) return
         isRefreshing = true
         viewModelScope.launch {
             try {
                 events = repository.getFeed()
                 errorMessage = null
             } catch (e: Exception) {
+                Log.e(TAG, "getFeed failed", e)
                 errorMessage = "Не удалось загрузить ленту"
             } finally {
                 isRefreshing = false
