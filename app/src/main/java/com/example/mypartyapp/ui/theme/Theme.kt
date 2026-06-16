@@ -2,6 +2,7 @@ package com.example.mypartyapp.ui.theme
 
 import android.app.Activity
 import android.os.Build
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -52,10 +53,10 @@ private val DarkColorScheme = darkColorScheme(
 
 @Composable
 fun MyPartyAppTheme(
-    // Дизайн СОНМ — светлый. Пока принудительно светлая тема, чтобы фирменный
-    // малиновый не приглушался тёмной темой телефона. Когда сделаем полноценную
-    // тёмную палитру — вернём darkTheme = isSystemInDarkTheme().
-    darkTheme: Boolean = false,
+    // Следуем системной теме. Тёмная палитра пока производная (цвета подберём
+    // позже) — но статус-бар не форсим, чтобы его иконки оставались согласованы
+    // с системной темой телефона.
+    darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
