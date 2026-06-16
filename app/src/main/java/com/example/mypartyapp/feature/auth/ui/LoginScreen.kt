@@ -1,5 +1,6 @@
 package com.example.mypartyapp.feature.auth.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -27,11 +28,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mypartyapp.R
 
 @Composable
 fun LoginScreen(
@@ -57,6 +60,12 @@ fun LoginScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Image(
+            painter = painterResource(R.drawable.logo),
+            contentDescription = "Логотип MyPartyApp",
+            modifier = Modifier.size(96.dp)
+        )
+        Spacer(Modifier.height(16.dp))
         Text("Вход", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(24.dp))
 

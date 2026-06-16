@@ -2,8 +2,9 @@
 <resources>
 
     <style name="Theme.MyPartyApp" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">#FFFFFF</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <!-- Splash: малиновый логотип на белом фоне (надёжно виден на всех телефонах) -->
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/logo_splash</item>
         <item name="postSplashScreenTheme">@style/Theme.MyPartyApp.App</item>
     </style>
 
