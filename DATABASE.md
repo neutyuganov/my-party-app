@@ -37,12 +37,15 @@
 |`updated_at`|`timestamptz`|—|`now()`|Дата последнего изменения (триггер)|
 |`deleted_at`|`timestamptz`|—|`null`|Мягкое удаление|
 
-**Триггер:** `profiles_updated_at` — автоматически обновляет `updated_at` при каждом UPDATE.
+**Триггеры:**
+- `profiles_updated_at` — автоматически обновляет `updated_at` при каждом UPDATE.
+- `on_auth_user_created` (на `auth.users`) → `handle_new_user()` — создаёт строку профиля при регистрации, беря `username` из `raw_user_meta_data` (приложение передаёт его в `data` при `signUp`). Если имя не передано — подставляется `user_<8 символов id>`. Поэтому клиент НЕ делает ручной INSERT в `profiles`.
 
 **RLS:**
 
 - SELECT: все видят профили где `deleted_at IS NULL`
 - UPDATE: только свой профиль (`auth.uid() = id`)
+- INSERT: отдельной политики нет — профиль создаёт только серверный триггер (`SECURITY DEFINER`, обходит RLS).
 
 ---
 
@@ -298,15 +301,16 @@ participants ────<  payments
 
 ---
 
-### `increment_tag_weights(p_user_id, p_event_id, p_delta)`
+### `increment_tag_weights(p_event_id, p_delta)`
 
-Обновляет веса тегов пользователя при действии с ивентом.
+Обновляет веса тегов **текущего** пользователя при действии с ивентом.
+
+**Безопасность:** `SECURITY INVOKER`, `search_path = ''`, доступна только роли `authenticated`. Пользователь определяется на сервере через `auth.uid()` — `p_user_id` параметром НЕ передаётся (иначе можно было бы менять чужие веса).
 
 **Параметры:**
 
 |Параметр|Тип|Описание|
 |---|---|---|
-|`p_user_id`|`uuid`|Чьи веса обновляем|
 |`p_event_id`|`uuid`|У какого ивента берём теги|
 |`p_delta`|`float4`|На сколько меняем вес|
 
@@ -325,7 +329,6 @@ participants ────<  payments
 
 ```kotlin
 supabase.postgrest.rpc("increment_tag_weights", mapOf(
-    "p_user_id"  to userId,
     "p_event_id" to eventId,
     "p_delta"    to 0.05f
 ))
@@ -333,27 +336,22 @@ supabase.postgrest.rpc("increment_tag_weights", mapOf(
 
 ---
 
-### `get_feed(p_user_id)`
+### `get_feed()`
 
-Возвращает ленту публичных будущих ивентов, отсортированных по интересам пользователя.
+Возвращает ленту публичных будущих ивентов, отсортированных по интересам **текущего** пользователя.
 
-**Параметры:**
-
-|Параметр|Тип|Описание|
-|---|---|---|
-|`p_user_id`|`uuid`|Для кого строим ленту|
+**Безопасность:** `SECURITY INVOKER`, `search_path = ''`, доступна только роли `authenticated`. Пользователь определяется через `auth.uid()` — параметр не передаётся.
 
 **Возвращает:** `SETOF events` — список строк из таблицы `events`.
 
-**Логика сортировки:** для каждого ивента суммируются веса его тегов у данного пользователя (`SUM(weight)`). Ивент с тегами "Барбекю + Дача" у пользователя с весами 0.9 и 0.7 получает score = 1.6 и идёт выше ивента с score = 0.3.
+**Логика сортировки:** для каждого ивента суммируются веса его тегов у пользователя (`SUM(weight)`). Ивент с тегами "Барбекю + Дача" у пользователя с весами 0.9 и 0.7 получает score = 1.6 и идёт выше ивента с score = 0.3.
 
 **Фильтры:** только `deleted_at IS NULL`, `is_private = false`, `starts_at > now()`.
 
 **Вызов из Android:**
 
 ```kotlin
-val feed = supabase.postgrest.rpc("get_feed", mapOf("p_user_id" to userId))
-    .decodeList<Event>()
+val feed = supabase.postgrest.rpc("get_feed").decodeList<Event>()
 ```
 
 ---

@@ -37,3 +37,9 @@ google-services.json
 local.secrets.properties
 secrets.properties
 *.env
+
+# Claude Code / установленные скиллы и артефакты ревью (не код приложения)
+.claude/
+.agents/
+skills-lock.json
+CODE_REVIEW.md
