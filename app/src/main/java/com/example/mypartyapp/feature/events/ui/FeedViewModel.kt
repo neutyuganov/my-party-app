@@ -16,26 +16,46 @@ class FeedViewModel : ViewModel() {
     var events by mutableStateOf<List<Event>>(emptyList())
         private set
 
-    var isLoading by mutableStateOf(true)
+    var isInitialLoading by mutableStateOf(true)
+        private set
+
+    // Управляет индикатором PullToRefreshBox — устанавливается синхронно до запуска корутины,
+    // чтобы два быстрых вызова не прошли проверку if (isRefreshing) одновременно.
+    var isRefreshing by mutableStateOf(false)
         private set
 
     var errorMessage by mutableStateOf<String?>(null)
         private set
 
     init {
-        loadFeed()
+        loadInitial()
     }
 
-    fun loadFeed() {
+    private fun loadInitial() {
         viewModelScope.launch {
-            isLoading = true
+            isInitialLoading = true
             errorMessage = null
             try {
                 events = repository.getFeed()
             } catch (e: Exception) {
                 errorMessage = "Не удалось загрузить ленту"
             } finally {
-                isLoading = false
+                isInitialLoading = false
+            }
+        }
+    }
+
+    fun refresh() {
+        if (isRefreshing) return
+        isRefreshing = true
+        viewModelScope.launch {
+            try {
+                events = repository.getFeed()
+                errorMessage = null
+            } catch (e: Exception) {
+                errorMessage = "Не удалось загрузить ленту"
+            } finally {
+                isRefreshing = false
             }
         }
     }

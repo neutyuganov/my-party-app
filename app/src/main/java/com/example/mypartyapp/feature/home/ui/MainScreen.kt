@@ -1,5 +1,6 @@
 package com.example.mypartyapp.feature.home.ui
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -22,6 +23,7 @@ private enum class MainTab { FEED, PROFILE }
 
 @Composable
 fun MainScreen(onSignOut: () -> Unit) {
+    // rememberSaveable сохраняет выбранную вкладку при повороте экрана
     var selectedTab by rememberSaveable { mutableStateOf(MainTab.FEED) }
 
     Scaffold(
@@ -42,12 +44,15 @@ fun MainScreen(onSignOut: () -> Unit) {
             }
         }
     ) { paddingValues ->
-        when (selectedTab) {
-            MainTab.FEED -> FeedScreen(modifier = Modifier.padding(paddingValues))
-            MainTab.PROFILE -> ProfileScreen(
-                modifier = Modifier.padding(paddingValues),
-                onSignOut = onSignOut
-            )
+        // Crossfade анимирует переход между вкладками вместо мгновенной замены
+        Crossfade(targetState = selectedTab, label = "tab_transition") { tab ->
+            when (tab) {
+                MainTab.FEED -> FeedScreen(modifier = Modifier.padding(paddingValues))
+                MainTab.PROFILE -> ProfileScreen(
+                    modifier = Modifier.padding(paddingValues),
+                    onSignOut = onSignOut
+                )
+            }
         }
     }
 }
