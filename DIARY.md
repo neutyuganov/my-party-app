@@ -1,6 +1,6 @@
 # 🎉 Моя вечеринка — Дневник разработки
 
-> Последнее обновление: 10 мая 2026
+> Последнее обновление: 16 июня 2026
 > Команда: Сережа + Саша
 
 ---
@@ -114,6 +114,22 @@
     - MainScreen.kt — нижняя навигация Главная / Профиль через NavigationBar
     - Исправлен двойной Scaffold (MainActivity + MainScreen) — убран внешний, insets теперь правильные
 
+### 16 июня 2026 ⭐
+- **Сессия Auth и качество кода — полная чистка**
+- Диагностированы и исправлены проблемы: сессия не сохранялась, мигание экрана входа, клавиатура перекрывала поля
+- SettingsSessionManager — одна строка в SupabaseClient, токен теперь сохраняется между запусками
+- SplashScreen API: системный splash держится пока Auth SDK не завершит инициализацию (awaitInitialization + 12s timeout)
+- AppNavigation: пустой Box вместо NavHost пока isCheckingSession=true — startDestination вычисляется корректно
+- Диагностированы 10-секундные задержки: задержка на стороне Supabase free-tier сервера, не в коде
+- imePadding + verticalScroll на LoginScreen и RegisterScreen — клавиатура не перекрывает форму
+- Crossfade при переключении вкладок в MainScreen — анимированный переход вместо мгновенного
+- sealed class Screen вместо magic strings в AppNavigation — ошибки в маршрутах теперь ловит компилятор
+- EventStatus и PaymentType как enum с кастомным сериализатором — неизвестное значение из БД не крашит приложение
+- Исправлен signUp: при ошибке вставки профиля вызывается signOut — пользователь не оказывается авторизован без профиля
+- dynamicColor = false — кастомная палитра из Color.kt теперь реально используется на всех устройствах
+- Удалены: неиспользуемый User.kt, install(Realtime) из SupabaseClient, debug-логи из EventRepository, мёртвый withTimeout из FeedViewModel
+- Обновлены зависимости: Gradle 9.4.1, AGP 9.2, Kotlin 2.4, Compose BOM 2026.05, Supabase SDK 3.6.0
+
 ---
 
 ## 🗺️ Следующие шаги
@@ -180,6 +196,12 @@
 | Огромный отступ у нижней навигации | Убран двойной Scaffold — был в MainActivity и в MainScreen | 10 мая |
 | Скачок списка при pull-to-refresh | Следствие двойного Scaffold, исправлено вместе с ним | 10 мая |
 | DateTimeFormatter создавался на каждой перерисовке | Вынесен в top-level константу DATE_FORMATTER | 10 мая |
+| Сессия сбрасывалась при каждом запуске | SettingsSessionManager сохраняет токен в SharedPreferences | 16 июн |
+| Мигание экрана входа при запуске | SplashScreen API держит системный splash пока awaitInitialization() не завершится | 16 июн |
+| NavHost вычислял startDestination с isAuthenticated=false | AppNavigation рендерит пустой Box пока isCheckingSession=true, NavHost создаётся только после | 16 июн |
+| Клавиатура перекрывала поля ввода | imePadding() + verticalScroll() на LoginScreen и RegisterScreen | 16 июн |
+| signUp создавал аккаунт без профиля при ошибке сети | При неудаче INSERT в profiles вызывается signOut() — сессия сбрасывается | 16 июн |
+| paymentType == "free" — сравнение строк без типов | PaymentType enum с кастомным сериализатором, fallback для неизвестных значений | 16 июн |
 
 ---
 
@@ -199,6 +221,9 @@
 | Supabase Storage для фото, путь в БД | Файлы не хранятся в БД, только ссылка | 10 мая |
 | Один Scaffold на весь MainScreen | Два Scaffold дублируют системные insets, нижнее меню раздувается | 10 мая |
 | rememberSaveable для выбранного таба | Сохраняет активный таб при повороте экрана | 10 мая |
+| SettingsSessionManager вместо ручного хранения токена | Одна строка в SupabaseClient, хранение через multiplatform-settings (transitive dep) | 16 июн |
+| dynamicColor = false | На Android 12+ Material You перезаписывал нашу палитру — Color.kt не использовался | 16 июн |
+| sealed class Screen для маршрутов | Magic strings "home", "login" — опечатку ловит только runtime, sealed class — компилятор | 16 июн |
 
 ---
 
