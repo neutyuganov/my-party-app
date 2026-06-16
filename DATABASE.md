@@ -281,6 +281,10 @@ participants ────<  payments
 |`payments_event_id_idx`|`payments`|`event_id`|Платежи мероприятия|
 |`payments_participant_id_idx`|`payments`|`participant_id`|Платёж участника|
 |`user_tag_weights_user_id_idx`|`user_tag_weights`|`user_id`|Веса пользователя|
+|`event_tags_tag_id_idx`|`event_tags`|`tag_id`|Джойн тегов в `get_feed`|
+|`user_tag_weights_tag_id_idx`|`user_tag_weights`|`tag_id`|Джойн весов в `get_feed`|
+
+> **Производительность RLS:** все политики используют `(select auth.uid())` вместо `auth.uid()` — Postgres вычисляет пользователя один раз на запрос, а не на каждую строку.
 
 ---
 
