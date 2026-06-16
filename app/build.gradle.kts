@@ -48,6 +48,14 @@ android {
         compose = true
         buildConfig = true
     }
+
+    testOptions {
+        unitTests {
+            // Заглушки android.util.* возвращают дефолты вместо исключения "not mocked".
+            // Нужно, чтобы тестировать код, который вызывает Log.w (наши сериализаторы).
+            isReturnDefaultValues = true
+        }
+    }
 }
 
 kotlin {
